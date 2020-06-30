@@ -1,13 +1,14 @@
 precision highp float;
 
-uniform vec3 u_vec3a[3];
-uniform float u_fa[10];
+uniform float u_time;
 varying vec2 v_uv;
 
 void main() {
-  vec3 c = vec3(0.0);
-  c.r += u_vec3a[0].r;
-  c.g += u_vec3a[1].g;
-  c.b += u_vec3a[2].b + u_fa[0];
-  gl_FragColor = vec4(c, 1.0);
+  gl_FragColor = vec4(
+    vec3(
+      (sin(u_time * v_uv.x) + 1.0) / 2.0,
+      (cos(u_time * v_uv.y) + 1.0) / 2.0,
+      (cos(u_time) + 1.0) / 2.0
+    ),
+    1.0);
 }

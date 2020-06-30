@@ -1,5 +1,5 @@
 //Direct port from https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
-export default class Clock {
+export class Clock {
 
   private autoStart: boolean;
   private startTime: number;

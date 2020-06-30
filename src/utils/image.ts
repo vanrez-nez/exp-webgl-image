@@ -6,7 +6,3 @@ export async function loadImage(src: string): Promise<HTMLImageElement> {
     img.src = src;
   });
 }
-
-export function padLeft(str: string, length: number, pad: string) {
-  return (pad.repeat(length) + str).slice(-length);
-}

@@ -1,4 +1,5 @@
 import { loadImage, Clock } from './utils';
+import PointerInput from './utils/pointer-input';
 
 import {
   GL,
@@ -19,6 +20,7 @@ class WebGLApplication {
 
   private gl: WebGLRenderingContext;
   private clock: Clock;
+  private pointer: PointerInput;
   private program: WebGLProgram;
   private uniforms: Map<string, ProgramUniform>;
   private attributes: Map<string, ProgramAttribute>;
@@ -31,8 +33,12 @@ class WebGLApplication {
     this.gl.useProgram(this.program);
     this.uniforms = getUniforms(this.gl, this.program);
     this.attributes = getAttributes(this.gl, this.program);
+    this.pointer = new PointerInput(canvas, {
+      normalize: true,
+      remapX: [0, 1],
+      remapY: [1, 0],
+    });
     this.initAttributes();
-
     this.render();
   }
 
@@ -61,9 +67,9 @@ class WebGLApplication {
   }
 
   updateUniforms() {
-    const { uniforms, clock } = this;
-    const u_time = uniforms.get('u_time');
-    u_time.value += clock.getDelta();
+    const { uniforms, clock, pointer } = this;
+    uniforms.get('u_time').value += clock.getDelta();
+    uniforms.get('u_mouse').value = [pointer.x, pointer.y];
   }
 
   render() {
@@ -72,7 +78,7 @@ class WebGLApplication {
     this.updateUniforms();
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
     requestAnimationFrame(this.render.bind(this));
   }
 }

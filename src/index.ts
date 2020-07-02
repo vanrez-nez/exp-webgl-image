@@ -37,7 +37,11 @@ class WebGLApplication {
       normalize: true,
       remapX: [0, 1],
       remapY: [1, 0],
+      swipeDirection: 'horizontal'
     });
+    this.pointer.on('swipe', (e) => {
+      console.log(e.swipe);
+    })
     this.initAttributes();
     this.render();
   }

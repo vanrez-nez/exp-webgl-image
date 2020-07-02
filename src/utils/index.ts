@@ -1,4 +1,5 @@
 export * from './clock';
+export * from './pointer-events';
+export * from './pointer-input';
+export * from './pointer-swiper';
 export * from './image';
-export { default as PointerEvents } from './pointer-events';
-export { default as PointerInput } from './pointer-input';

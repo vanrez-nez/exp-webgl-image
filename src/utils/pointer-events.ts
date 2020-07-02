@@ -38,7 +38,7 @@ export interface TypedEventEmitter<T> {
   emit: (key: string, event: any) => void;
 }
 
-export default class PointerEvents extends (EventEmitter as { new(): TypedEventEmitter<PointerEventsTypes>}) {
+export class PointerEvents extends (EventEmitter as { new(): TypedEventEmitter<PointerEventsTypes>}) {
   private target: EventTarget;
   private parent: EventTarget;
   private unbindEvents: Function;

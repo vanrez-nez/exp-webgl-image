@@ -1,5 +1,4 @@
-import { loadImage, Clock } from './utils';
-import PointerInput from './utils/pointer-input';
+import { loadImage, Clock, PointerInput, PointerSwiper } from './utils';
 
 import {
   GL,
@@ -20,7 +19,7 @@ class WebGLApplication {
 
   private gl: WebGLRenderingContext;
   private clock: Clock;
-  private pointer: PointerInput;
+  private pointer: PointerSwiper;
   private program: WebGLProgram;
   private uniforms: Map<string, ProgramUniform>;
   private attributes: Map<string, ProgramAttribute>;
@@ -33,14 +32,13 @@ class WebGLApplication {
     this.gl.useProgram(this.program);
     this.uniforms = getUniforms(this.gl, this.program);
     this.attributes = getAttributes(this.gl, this.program);
-    this.pointer = new PointerInput(canvas, {
+    this.pointer = new PointerSwiper(canvas, {
       normalize: true,
       remapX: [0, 1],
       remapY: [1, 0],
-      swipeDirection: 'horizontal'
     });
     this.pointer.on('swipe', (e) => {
-      console.log(e.swipe);
+      console.log(e);
     })
     this.initAttributes();
     this.render();

@@ -168,8 +168,11 @@ function getUniformDefaultValue(type: number, size: number) {
 }
 
 /**
- * Custom map class to handle the allocations of inactive/invalid uniforms
+ * Custom map class to handle the allocations of inactive/invalid uniforms.
  * It serves a stub when the key doesn't exists in original map to avoid raising errors.
+ * This happens because getProgramParameter(program, GL.ACTIVE_UNIFORMS) only reports the
+ * uniforms in use, so even if a uniform declaration exists, the unused uniforms will be
+ * cleared during the program compilation.
  */
 export class UniformMap extends Map {
 

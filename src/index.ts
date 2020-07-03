@@ -5,7 +5,7 @@ import {
   createProgram,
   getUniforms,
   getAttributes,
-  resizeViewport,
+  resizeViewportToCanvas,
   ProgramUniform,
   ProgramAttribute,
 } from './wgl';
@@ -23,8 +23,7 @@ class WebGLApplication {
   private uniforms: Map<string, ProgramUniform>;
   private attributes: Map<string, ProgramAttribute>;
 
-  constructor() {
-    const canvas = document.querySelector('#js-canvas') as HTMLCanvasElement;
+  constructor(canvas: HTMLCanvasElement) {
     this.gl = createContext(canvas, 'webgl2');
     this.clock = new Clock();
     this.program = createProgram(this.gl, vertexShader, fragmentShader);
@@ -62,8 +61,7 @@ class WebGLApplication {
   updateSize() {
     const { gl, uniforms } = this;
     const { height, width } = gl.canvas;
-    const { innerWidth, innerHeight } = window;
-    resizeViewport(gl, innerWidth, innerHeight);
+    resizeViewportToCanvas(gl);
     const maxSize = Math.min(height, width);
     uniforms.get('u_ratio').value = [width / maxSize, height / maxSize];
     uniforms.get('u_resolution').value = [width, height];
@@ -86,4 +84,9 @@ class WebGLApplication {
   }
 }
 
-new WebGLApplication();
+
+const apps = [];
+for (let i = 0; i < 5; i++) {
+  const canvas = document.querySelector(`#js-canvas-${i}`) as HTMLCanvasElement;
+  apps.push(new WebGLApplication(canvas));
+}

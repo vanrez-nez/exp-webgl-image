@@ -1,3 +1,5 @@
+import { getState } from './wgl-state';
+
 export function createContext(canvas: HTMLCanvasElement, contextType: string, options?: WebGLContextAttributes) {
   const ids = ['webgl2', 'webgl', 'experimental-webgl'];
   const start = ids.indexOf(contextType);
@@ -15,10 +17,15 @@ export function resizeViewport(gl: WebGLRenderingContext, width: number, height:
   if (canvas.width !== w || canvas.height !== h) {
     canvas.width = w;
     canvas.height = h;
-    gl.viewport(0, 0, w, h);
+    getState(gl).setViewport(0, 0, w, h);
     Object.assign((canvas as HTMLCanvasElement).style, {
       width: `${width}px`,
       height: `${height}px`
     });
   }
+}
+
+export function resizeViewportToCanvas(gl: WebGLRenderingContext, dpr: number = 1) {
+  const { width, height } = gl.canvas;
+  getState(gl).setViewport(0, 0, width * dpr, height * dpr);
 }

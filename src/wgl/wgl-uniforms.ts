@@ -136,14 +136,25 @@ function getSetterName(type: number, size: number) {
   return `uniform${suffix}`;
 }
 
-const UniformSetters = {}
+const UniformSetters:Map<WebGLRenderingContext, object> = new Map();
 function getUniformSetter(gl: WebGLRenderingContext, type: number, size: number) {
   const key = `${type}_${size}`;
-  if (!UniformSetters[key]) {
+
+  /**
+   * Try pulling setters cache object for this rendering instance.
+   * We cant share the setters among different rendering contexts.
+  */
+  if (!UniformSetters.has(gl)) {
+    UniformSetters.set(gl, {});
+  }
+  const setters = UniformSetters.get(gl);
+
+  // Create setter if it doesn't exist
+  if (!setters[key]) {
     const glName = getSetterName(type, size);
     const glFunction = gl[glName];
     const isMatrix = /Matrix/.test(glName);
-    UniformSetters[key] = function setUniform(location: WebGLUniformLocation, value: any) {
+    setters[key] = function setUniform(location: WebGLUniformLocation, value: any) {
       if (isMatrix) {
         glFunction.call(gl, location, false, value);
       } else {
@@ -151,7 +162,7 @@ function getUniformSetter(gl: WebGLRenderingContext, type: number, size: number)
       }
     };
   }
-  return UniformSetters[key];
+  return setters[key];
 }
 
 function getUniformDefaultValue(type: number, size: number) {
@@ -171,7 +182,7 @@ function getUniformDefaultValue(type: number, size: number) {
  * Custom map class to handle the allocations of inactive/invalid uniforms.
  * It serves a stub when the key doesn't exists in original map to avoid raising errors.
  * This happens because getProgramParameter(program, GL.ACTIVE_UNIFORMS) only reports the
- * uniforms in use, so even if a uniform declaration exists, the unused uniforms will be
+ * uniforms in use, so even if a uniform declaration exists, the unused uniforms are
  * cleared during the program compilation.
  */
 export class UniformMap extends Map {

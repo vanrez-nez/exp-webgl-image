@@ -60,12 +60,17 @@ class WebGLApplication {
   }
 
   updateSize() {
+    const { gl, uniforms } = this;
+    const { height, width } = gl.canvas;
     const { innerWidth, innerHeight } = window;
-    resizeViewport(this.gl, innerWidth, innerHeight);
+    resizeViewport(gl, innerWidth, innerHeight);
+    const maxSize = Math.min(height, width);
+    uniforms.get('u_ratio').value = [width / maxSize, height / maxSize];
+    uniforms.get('u_resolution').value = [width, height];
   }
 
   updateUniforms() {
-    const { uniforms, clock, pointer } = this;
+    const { uniforms, clock, pointer, gl } = this;
     uniforms.get('u_time').value += clock.getDelta();
     uniforms.get('u_mouse').value = [pointer.x, pointer.y];
   }

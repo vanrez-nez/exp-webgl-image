@@ -28,16 +28,16 @@ const UNIFORM_DESCRIPTORS = {
 };
 
 export class ProgramUniform {
-  public current: any;
-  private setter: Function;
-  private needsUpdate: boolean;
+  protected current: any;
+  protected needsUpdate: boolean;
   public autoUpdate: boolean;
-  private isArray: boolean;
-  private isSampler: boolean;
   public location: WebGLUniformLocation;
   public program: WebGLProgram;
   public info: WebGLActiveInfo;
   public parts: any;
+  private isArray: boolean;
+  private isSampler: boolean;
+  private setter: Function;
 
   constructor(gl: WebGLRenderingContext, program: WebGLProgram, info: WebGLActiveInfo) {
     const { name, size, type } = info;
@@ -53,9 +53,9 @@ export class ProgramUniform {
     this.update();
   }
 
-  public equals(a: any, b: any) {
+  private equals(a: any, b: any) {
     const { isArray } = this;
-    return  a === b || isArray && arraysEqual(a, b);
+    return a === b || isArray && arraysEqual(a, b);
   }
 
   public update() {
@@ -85,6 +85,27 @@ export class ProgramUniform {
   }
 }
 
+/**
+ * Uniform class to store inactive/invalid uniform names
+ * Useful to have a placeholder of values when the actual uniform
+ * is not active or doesn't exists in current program.
+*/
+class StubUniform extends ProgramUniform {
+  constructor(gl: WebGLRenderingContext, program: WebGLProgram, name: string) {
+    super(gl, program, { name, type: GL.BOOL, size: 1 });
+    this.autoUpdate = false;
+    this.needsUpdate = false;
+  }
+
+  set value(value: any) {
+    this.current = value;
+  }
+}
+
+/**
+ * Parses a WebGL Uniform name and returns a friendly struct
+ * @param name string reported by getActiveUniform()
+ */
 function parseUniformName(name: string) {
   const parts = name.match(/(\w+)/g);
   const isStruct = name.indexOf('.') > -1;
@@ -146,8 +167,42 @@ function getUniformDefaultValue(type: number, size: number) {
   return value;
 }
 
+/**
+ * Custom map class to handle the allocations of inactive/invalid uniforms
+ * It serves a stub when the key doesn't exists in original map to avoid raising errors.
+ */
+export class UniformMap extends Map {
+
+  private gl: WebGLRenderingContext;
+  private program: WebGLProgram;
+  private stubs: Map<string, StubUniform>;
+
+  constructor(gl: WebGLRenderingContext, program: WebGLProgram) {
+    super();
+    this.gl = gl;
+    this.program = program;
+    this.stubs = new Map();
+  }
+
+  private allocateStub(key: string) {
+    const { gl, program, stubs } = this;
+    if (!stubs.has(key)) {
+      console.warn(`Using uniform: ${key} as stub (not active in current program)`);
+      stubs.set(key, new StubUniform(gl, program, key));
+    }
+  }
+
+  get(key: string) {
+    if (super.has(key)) {
+      return super.get(key);
+    }
+    this.allocateStub(key);
+    return this.stubs.get(key);
+  }
+}
+
 export function getUniforms(gl: WebGLRenderingContext, program: WebGLProgram) {
-  const uniforms: Map<string, ProgramUniform> = new Map();
+  const uniforms: UniformMap = new UniformMap(gl, program);
   let count = gl.getProgramParameter(program, GL.ACTIVE_UNIFORMS);
   for (let i = 0; i < count; i++) {
     const info = gl.getActiveUniform(program, i);

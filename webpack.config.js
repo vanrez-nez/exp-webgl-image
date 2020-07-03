@@ -26,6 +26,10 @@ module.exports = {
     ]
   },
   devtool: 'cheap-source-map',
+  devServer: {
+    useLocalIp: true,
+    host: '0.0.0.0',
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'index.html'

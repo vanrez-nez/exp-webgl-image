@@ -2,6 +2,11 @@ import { PointerEvent } from './pointer-events';
 import { PointerInputOptions, PointerInput } from "./pointer-input";
 import { toDegrees } from './math';
 
+/**
+ * TODO: Report proper velocity and acceleration using a low-pass filter
+ * TODO: Support other gestures such as pinch, rotate, double-tap or pan
+ */
+
 type PointArray = [number, number];
 type RangeArray = [number, number];
 type SwipeDirection = 'vertical' | 'horizontal';

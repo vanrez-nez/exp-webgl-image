@@ -129,14 +129,16 @@ export class PointerEvents extends (EventEmitter as { new(): TypedEventEmitter<P
 
   private onEnd = (event: MixedPointerEvent) => {
     const { lastPosition, startTime, tapThreshold, tapDelay} = this;
-    this.isDown = false;
     const nEvent = this.normalizeEvent(event);
     const pos = [nEvent.clientX, nEvent.clientY];
     const dst = distance(pos, lastPosition);
     const elapsedTime = performance.now() - startTime;
-    this.emit('up', nEvent);
+    if (this.isDown) {
+      this.emit('up', nEvent);
+    }
     if (nEvent.inside && Math.abs(dst) < tapThreshold && elapsedTime < tapDelay) {
       this.emit('tap', nEvent);
     }
+    this.isDown = false;
   }
 }

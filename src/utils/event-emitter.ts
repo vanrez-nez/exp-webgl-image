@@ -24,17 +24,30 @@ export default class EventEmitter {
   }
 
   off(type: string, handler: Function) {
-    const handlers = this.types.get(type);
+    const { types } = this;
+    if (!types || !types.has(type)) return;
+    const handlers = types.get(type);
     handlers.delete(handler);
   }
 
   emit(type: string, event: any) {
-    if (this.paused) return false;
-    const handlers = this.types.get(type);
-    if (handlers) {
-      for (let handler of handlers) {
-        handler(event);
-      }
+    const { types } = this;
+    if (!types || !types.has(type) || this.paused) return;
+    const handlers = types.get(type);
+    for (let handler of handlers) {
+      handler(event);
     }
+  }
+
+  removeAllListeners(type?: string) {
+    const { types } = this;
+    if (!types) return;
+    if (!type) {
+      types.forEach(handlers => handlers.clear());
+      return;
+    }
+    if (!types.has(type)) return;
+    const handlers = this.types.get(type);
+    handlers.clear();
   }
 }

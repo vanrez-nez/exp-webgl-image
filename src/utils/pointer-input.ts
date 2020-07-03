@@ -76,6 +76,10 @@ export class PointerInput extends EventEmitter {
     } as PointerInputEvent
   }
 
+  public unbind() {
+    this.input.removeAllListeners();
+  }
+
   protected onMove = (e: PointerEvent) => {
     this.updatePosition(e);
     this.emit('move', this.wrapEvent(e));

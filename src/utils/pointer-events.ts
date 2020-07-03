@@ -36,6 +36,9 @@ export interface TypedEventEmitter<T> {
   on<K extends keyof T>(s: K, listener: (v:T[K]) => void);
   off<K extends keyof T>(s: K, listener: (v:T[K]) => void);
   emit: (key: string, event: any) => void;
+  removeAllListeners<K extends keyof T>(s?: K);
+  pause: () => void;
+  resume: () => void;
 }
 
 export class PointerEvents extends (EventEmitter as { new(): TypedEventEmitter<PointerEventsTypes>}) {

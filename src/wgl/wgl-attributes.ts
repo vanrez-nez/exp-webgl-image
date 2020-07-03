@@ -1,5 +1,6 @@
 import { GL } from './wgl-const';
 import { typedArrToGLType } from './wgl-utils';
+import { getState } from './wgl-state';
 
 export interface AttributeArrayParams {
   size: number;
@@ -34,7 +35,7 @@ export class ProgramAttribute {
   }
 
   bindBuffer(target = GL.ARRAY_BUFFER) {
-    this.gl.bindBuffer(target, this.buffer);
+    getState(this.gl).bindBuffer(target, this.buffer);
   }
 
   setAttributeArray({ size, normalized, stride, offset }: AttributeArrayParams) {
@@ -50,7 +51,7 @@ export class ProgramAttribute {
   bufferData(data: BufferSource, target = GL.ARRAY_BUFFER) {
     this.bindBuffer(target);
     this.type = typedArrToGLType(data);
-    this.gl.bufferData(target, data, GL.STATIC_DRAW);
+    getState(this.gl).bufferData(target, data, GL.STATIC_DRAW);
   }
 }
 

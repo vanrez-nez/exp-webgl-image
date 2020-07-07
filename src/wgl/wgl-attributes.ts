@@ -38,7 +38,7 @@ export class ProgramAttribute {
     getState(this.gl).bindBuffer(target, this.buffer);
   }
 
-  setAttributeArray({ size, normalized, stride, offset }: AttributeArrayParams) {
+  setAttribPointer({ size, normalized = false, stride = 0, offset = 0 }: AttributeArrayParams) {
     const { location, type } = this;
     const loc = location as number;
     this.gl.vertexAttribPointer(loc, size, type, normalized, stride, offset);

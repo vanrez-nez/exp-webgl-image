@@ -1,4 +1,4 @@
-import { loadImage, Clock, PointerInput, nextFrame, getSizeToCover } from './utils';
+import { Clock, PointerInput, nextFrame, getSizeToCover } from './utils';
 import { GL } from './wgl/wgl-const';
 import {
   createContext,
@@ -8,11 +8,13 @@ import {
   resizeViewportToCanvas,
   ProgramUniform,
   ProgramAttribute,
+  Texture2D,
 } from './wgl';
 
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
 import ImageGrid from '../assets/uv_grid_np2.jpg';
+import ImageNoise from '../assets/noise.png';
 
 class WebGLApplication {
 
@@ -22,8 +24,8 @@ class WebGLApplication {
   private program: WebGLProgram;
   private uniforms: Map<string, ProgramUniform>;
   private attributes: Map<string, ProgramAttribute>;
-  private texture: WebGLTexture;
-  private image: HTMLImageElement;
+  private noiseTexture: Texture2D;
+  private mainTexture: Texture2D;
 
   constructor(canvas: HTMLCanvasElement) {
     this.gl = createContext(canvas, 'webgl2', { alpha: true });
@@ -34,7 +36,7 @@ class WebGLApplication {
       remapY: [1, 0],
     });
     this.createProgram();
-    this.createTexture();
+    this.initTextures();
     this.render();
   }
 
@@ -62,27 +64,27 @@ class WebGLApplication {
     uv.enableAttributeArray();
   }
 
-  async createTexture() {
-    const { gl, uniforms } = this;
-    const image = await loadImage(ImageGrid);
-    this.texture = gl.createTexture();
-    this.image = image;
-    gl.bindTexture(GL.TEXTURE_2D, this.texture);
-    gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-    gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-    gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-    gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-    gl.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
-    gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
-    uniforms.get('u_texture').value = this.texture;
+  async initTextures() {
+    const { gl } = this;
+    this.mainTexture = new Texture2D(gl);
+    this.mainTexture.unitId = 0;
+    this.noiseTexture = new Texture2D(gl);
+    this.noiseTexture.unitId = 1;
+    await Promise.all([
+      this.mainTexture.load(ImageGrid),
+      this.noiseTexture.load(ImageNoise),
+    ]);
+    this.uniforms.get('u_tImage').value = 0;
+    this.uniforms.get('u_tNoise').value = 1;
   }
 
   updateSize() {
-    const { gl, uniforms, image } = this;
+    const { gl, uniforms } = this;
+    const { image } = this.mainTexture
     const { clientWidth: width, clientHeight: height } = gl.canvas as HTMLCanvasElement;
     resizeViewportToCanvas(gl);
     if (image) {
-      const { naturalWidth: nW, naturalHeight: nH } = image;
+      const { width: nW, height: nH } = image;
       const [w, h] = getSizeToCover(nW / width, nH / height, 1, 1);
       // const [w, h] = getSizeToContain(nW / width, nH / height, 1, 1);
       uniforms.get('u_scale').value = [w, h];
@@ -101,7 +103,7 @@ class WebGLApplication {
   }
 
   render = () => {
-    const { gl, attributes } = this;
+    const { gl } = this;
     if (gl.isContextLost()) return;
     this.updateSize();
     this.updateUniforms();

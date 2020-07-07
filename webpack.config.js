@@ -1,4 +1,4 @@
-const path = require('path');
+const Path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
@@ -8,7 +8,10 @@ module.exports = {
     filename: 'main.bundle.js'
   },
   resolve: {
-    extensions: ['.ts', '.js', '.json']
+    extensions: ['.ts', '.js', '.json'],
+    alias: {
+      "@": Path.resolve(__dirname, "src")
+    }
   },
   module: {
     rules: [

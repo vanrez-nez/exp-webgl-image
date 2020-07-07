@@ -29,7 +29,7 @@ export class WebGLState {
     if (!arraysEqual(this.viewport, newViewport)) {
       this.gl.viewport(x, y, width, height);
       this.viewport = newViewport as Vector4;
-      console.log('setViewport');
+      return true;
     }
   }
 
@@ -38,7 +38,6 @@ export class WebGLState {
     if (!arraysEqual(this.clearColor, [r, g, b, a])) {
       this.gl.clearColor(r, g, b, a);
       this.clearColor = newColor as Vector4;
-      console.log('setClearColor');
     }
   }
 

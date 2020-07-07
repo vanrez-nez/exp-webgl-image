@@ -1,8 +1,11 @@
+/**
+ * Adds an event listener on target and returns the function to unbind it.
+ */
 export function htmlEvent(
   target: EventTarget,
   type: string,
   callback: EventListenerOrEventListenerObject,
-  options: AddEventListenerOptions
+  options?: AddEventListenerOptions
 ) {
   target.addEventListener(type, callback, options);
   return () => {

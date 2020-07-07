@@ -28,7 +28,8 @@ export function compileShader(gl: WebGLRenderingContext, type: number, source: s
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   const success = gl.getShaderParameter(shader, GL.COMPILE_STATUS);
-  if (!success) {
+  const contextLost = gl.isContextLost();
+  if (!success && !contextLost) {
     const error = gl.getShaderInfoLog(shader);
     logProgramError(error, source);
   }
@@ -43,7 +44,8 @@ export function createProgram(gl: WebGLRenderingContext, vertexSource: string, f
   gl.attachShader(program, fragment);
   gl.linkProgram(program);
   const linked = gl.getProgramParameter(program, GL.LINK_STATUS);
-  if (!linked) {
+  const contextLost = gl.isContextLost();
+  if (!linked && !contextLost) {
     const error = gl.getProgramInfoLog(program);
     gl.deleteProgram(program);
     console.warn('Program link error:', error);

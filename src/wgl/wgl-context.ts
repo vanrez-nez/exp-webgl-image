@@ -26,6 +26,9 @@ export function resizeViewport(gl: WebGLRenderingContext, width: number, height:
 }
 
 export function resizeViewportToCanvas(gl: WebGLRenderingContext, dpr: number = 1) {
-  const { width, height } = gl.canvas;
-  getState(gl).setViewport(0, 0, width * dpr, height * dpr);
+  const { clientWidth, clientHeight } = gl.canvas as HTMLCanvasElement;
+  if (getState(gl).setViewport(0, 0, clientWidth * dpr, clientHeight * dpr)) {
+    gl.canvas.width = clientWidth;
+    gl.canvas.height = clientHeight;
+  }
 }

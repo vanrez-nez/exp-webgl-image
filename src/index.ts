@@ -1,4 +1,4 @@
-import { loadImage, Clock, PointerInput, nextFrame } from './utils';
+import { loadImage, Clock, PointerInput, nextFrame, getSizeToCover } from './utils';
 import { GL } from './wgl/wgl-const';
 import {
   createContext,
@@ -12,7 +12,7 @@ import {
 
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
-import ImageGrid from '../assets/uv_grid.jpg';
+import ImageGrid from '../assets/uv_grid_np2.jpg';
 
 class WebGLApplication {
 
@@ -23,9 +23,10 @@ class WebGLApplication {
   private uniforms: Map<string, ProgramUniform>;
   private attributes: Map<string, ProgramAttribute>;
   private texture: WebGLTexture;
+  private image: HTMLImageElement;
 
   constructor(canvas: HTMLCanvasElement) {
-    this.gl = createContext(canvas, 'webgl2');
+    this.gl = createContext(canvas, 'webgl2', { alpha: true });
     this.clock = new Clock();
     this.pointer = new PointerInput(canvas as HTMLCanvasElement, {
       normalize: true,
@@ -65,6 +66,7 @@ class WebGLApplication {
     const { gl, uniforms } = this;
     const image = await loadImage(ImageGrid);
     this.texture = gl.createTexture();
+    this.image = image;
     gl.bindTexture(GL.TEXTURE_2D, this.texture);
     gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
     gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
@@ -76,12 +78,20 @@ class WebGLApplication {
   }
 
   updateSize() {
-    const { gl, uniforms } = this;
+    const { gl, uniforms, image } = this;
     const { clientWidth: width, clientHeight: height } = gl.canvas as HTMLCanvasElement;
     resizeViewportToCanvas(gl);
-    const minSize = Math.min(height, width);
-    uniforms.get('u_ratio').value = [width / minSize, height / minSize];
-    uniforms.get('u_resolution').value = [width, height];
+    if (image) {
+      const { naturalWidth: nW, naturalHeight: nH } = image;
+      const [w, h] = getSizeToCover(nW / width, nH / height, 1, 1);
+      // const [w, h] = getSizeToContain(nW / width, nH / height, 1, 1);
+      uniforms.get('u_scale').value = [w, h];
+      uniforms.get('u_offset').value = [0, 0];
+      uniforms.get('u_origin').value = [0.5, 0.5];
+
+      const ratioMax = Math.max(width, height);
+      uniforms.get('u_ratio').value = [width / ratioMax, height / ratioMax];
+    }
   }
 
   updateUniforms() {

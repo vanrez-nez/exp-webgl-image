@@ -201,7 +201,7 @@ export class UniformMap extends Map {
   private allocateStub(key: string) {
     const { gl, program, stubs } = this;
     if (!stubs.has(key)) {
-      console.warn(`Using uniform: ${key} as stub (not active in current program)`);
+      console.warn(`Uniform "${key}" is beign used as stub (not active in current program)`);
       stubs.set(key, new StubUniform(gl, program, key));
     }
   }

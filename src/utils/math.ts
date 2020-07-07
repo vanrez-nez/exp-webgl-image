@@ -20,3 +20,21 @@ export function toDegrees(radians: number) {
 export function toRadians(degrees: number) {
   return degrees * DEG2RAD;
 }
+
+export function isPowerOfTwo(x: number) {
+  return (x & (x - 1)) == 0;
+}
+
+export function floorPowerOfTwo(x: number) {
+  let p = 1;
+  while( x >>= 1) p <<= 1;
+  return p;
+}
+
+export function ceilPowerOfTwo(x: number) {
+  if (x < 1) return 1;
+  let p = 2;
+  x--;
+  while( x >>= 1) p <<= 1;
+  return p;
+}

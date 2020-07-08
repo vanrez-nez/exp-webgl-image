@@ -5,6 +5,10 @@ export function distance(a: number[], b: number[]) {
   return Math.hypot(a[0] - b[0], a[1] - b[1]);
 }
 
+export function lerp(a: number, b: number, t: number) {
+  return (1 - t) * a + t * b;
+}
+
 export function clamp(val: number, min: number, max: number) {
   return Math.min(Math.max(val, min), max);
 }

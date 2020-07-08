@@ -1,4 +1,5 @@
-import { Clock, PointerInput, nextFrame, getSizeToCover } from './utils';
+import { Clock, PointerInput, nextFrame, getSizeToCover, Tween, easingQuinticInOut } from './utils';
+import { TweenLite } from 'gsap';
 import { GL } from './wgl/wgl-const';
 import {
   createContext,
@@ -13,7 +14,7 @@ import {
 
 import vertexShader from './shaders/vertex.glsl';
 import fragmentShader from './shaders/fragment.glsl';
-import ImageGrid from '../assets/uv_grid_np2.jpg';
+import ImageGrid from '../assets/uv_grid.png';
 import ImageNoise from '../assets/noise.png';
 
 class WebGLApplication {
@@ -35,6 +36,7 @@ class WebGLApplication {
       remapX: [0, 1],
       remapY: [1, 0],
     });
+    this.pointer.on('tap', this.makeWave);
     this.createProgram();
     this.initTextures();
     this.render();
@@ -47,7 +49,6 @@ class WebGLApplication {
     this.uniforms = getUniforms(gl, this.program);
     this.attributes = getAttributes(gl, this.program);
     this.initAttributes();
-
   }
 
   initAttributes() {
@@ -62,6 +63,18 @@ class WebGLApplication {
     uv.bufferData(new Float32Array([0, 0, 2, 0, 0, 2]));
     uv.setAttribPointer({ size: 2 });
     uv.enableAttributeArray();
+  }
+
+  makeWave = () => {
+    const { uniforms } = this;
+    const time = uniforms.get('u_time');
+    const intensity = uniforms.get('u_waveIntensity');
+    const scale = uniforms.get('u_waveScale');
+
+    TweenLite.fromTo(scale, 1, { value: 1 }, { value: 2.5 });
+    TweenLite.fromTo(time, 2, { value: 0 }, { value: 3, ease: 'Quad.easeInOut' });
+    TweenLite.fromTo(intensity, 1, { value: 0.01 }, { value: 1, ease: 'Quad.easeIn' });
+    TweenLite.to(intensity, 1, { value: 0.01, delay: 1, ease: 'Quad.easeOut' });
   }
 
   async initTextures() {
@@ -98,7 +111,7 @@ class WebGLApplication {
 
   updateUniforms() {
     const { uniforms, clock, pointer, gl } = this;
-    uniforms.get('u_time').value += clock.getDelta();
+    // uniforms.get('u_time').value += clock.getDelta();
     uniforms.get('u_mouse').value = [pointer.x, pointer.y];
   }
 

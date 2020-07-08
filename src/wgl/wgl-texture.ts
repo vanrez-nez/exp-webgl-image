@@ -14,8 +14,6 @@ export interface TextureConstructorParams {
   mipmaps?: boolean;
 }
 
-let id = 0;
-
 export class Texture2D {
 
   public glTexture: WebGLTexture;

@@ -1,3 +1,4 @@
+export * from './tween';
 export * from './clock';
 export * from './event-emitter';
 export * from './events';

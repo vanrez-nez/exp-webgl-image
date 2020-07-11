@@ -30,5 +30,6 @@ export function resizeViewportToCanvas(gl: WebGLRenderingContext, dpr: number = 
   if (getState(gl).setViewport(0, 0, clientWidth * dpr, clientHeight * dpr)) {
     gl.canvas.width = clientWidth;
     gl.canvas.height = clientHeight;
+    return true;
   }
 }

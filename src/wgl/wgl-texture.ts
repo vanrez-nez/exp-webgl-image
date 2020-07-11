@@ -59,17 +59,20 @@ export class Texture2D {
   }
 
   public update() {
-    const { gl, image, glTexture, wrapS, wrapT, minFilter, magFilter, flipY } = this;
-    gl.activeTexture(GL.TEXTURE0 + this.unitId);
-    gl.bindTexture(GL.TEXTURE_2D, glTexture);
+    const { gl, image, wrapS, wrapT, minFilter, magFilter, flipY } = this;
+    this.bindTexture();
     gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, wrapS);
     gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, wrapT);
     gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, minFilter);
     gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, magFilter);
-    if (flipY) {
-      gl.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1);
-    }
+    gl.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, flipY);
     gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
+  }
+
+  public bindTexture() {
+    const { gl, glTexture } = this;
+    gl.activeTexture(GL.TEXTURE0 + this.unitId);
+    gl.bindTexture(GL.TEXTURE_2D, glTexture);
   }
 
   private resizeTexture() {

@@ -1,141 +1,79 @@
-import { Clock, PointerInput, nextFrame, getSizeToCover, Tween, easingQuinticInOut } from './utils';
-import { TweenLite } from 'gsap';
-import { GL } from './wgl/wgl-const';
-import {
-  createContext,
-  createProgram,
-  getUniforms,
-  getAttributes,
-  resizeViewportToCanvas,
-  ProgramUniform,
-  ProgramAttribute,
-  Texture2D,
-} from './wgl';
+import { WebGLImage } from './image';
+import { ImageEffect } from './effect';
 
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
-import ImageGrid from '../assets/uv_grid.png';
-import ImageNoise from '../assets/noise.png';
-
-class WebGLApplication {
-
-  private gl: WebGLRenderingContext;
-  private clock: Clock;
-  private pointer: PointerInput;
-  private program: WebGLProgram;
-  private uniforms: Map<string, ProgramUniform>;
-  private attributes: Map<string, ProgramAttribute>;
-  private noiseTexture: Texture2D;
-  private mainTexture: Texture2D;
-
-  constructor(canvas: HTMLCanvasElement) {
-    this.gl = createContext(canvas, 'webgl2', { alpha: true });
-    this.clock = new Clock();
-    this.pointer = new PointerInput(canvas as HTMLCanvasElement, {
-      normalize: true,
-      remapX: [0, 1],
-      remapY: [1, 0],
-    });
-    this.pointer.on('tap', this.makeWave);
-    this.createProgram();
-    this.initTextures();
-    this.render();
-  }
-
-  createProgram() {
-    const { gl } = this;
-    this.program = createProgram(gl, vertexShader, fragmentShader);
-    gl.useProgram(this.program);
-    this.uniforms = getUniforms(gl, this.program);
-    this.attributes = getAttributes(gl, this.program);
-    this.initAttributes();
-  }
-
-  initAttributes() {
-    const { attributes } = this;
-
-    const pos = attributes.get('position');
-    pos.bufferData(new Float32Array([-1, -1, 3, -1, -1, 3]));
-    pos.setAttribPointer({ size: 2 });
-    pos.enableAttributeArray();
-
-    const uv = attributes.get('uv');
-    uv.bufferData(new Float32Array([0, 0, 2, 0, 0, 2]));
-    uv.setAttribPointer({ size: 2 });
-    uv.enableAttributeArray();
-  }
-
-  makeWave = () => {
-    const { uniforms } = this;
-    const time = uniforms.get('u_time');
-    const intensity = uniforms.get('u_waveIntensity');
-    const scale = uniforms.get('u_waveScale');
-
-    TweenLite.fromTo(scale, 1, { value: 1 }, { value: 2.5 });
-    TweenLite.fromTo(time, 2, { value: 0 }, { value: 3, ease: 'Quad.easeInOut' });
-    TweenLite.fromTo(intensity, 1, { value: 0.01 }, { value: 1, ease: 'Quad.easeIn' });
-    TweenLite.to(intensity, 1, { value: 0.01, delay: 1, ease: 'Quad.easeOut' });
-  }
-
-  async initTextures() {
-    const { gl } = this;
-    this.mainTexture = new Texture2D(gl);
-    this.mainTexture.unitId = 0;
-    this.noiseTexture = new Texture2D(gl);
-    this.noiseTexture.unitId = 1;
-    await Promise.all([
-      this.mainTexture.load(ImageGrid),
-      this.noiseTexture.load(ImageNoise),
-    ]);
-    this.uniforms.get('u_tImage').value = 0;
-    this.uniforms.get('u_tNoise').value = 1;
-  }
-
-  updateSize() {
-    const { gl, uniforms } = this;
-    const { image } = this.mainTexture
-    const { clientWidth: width, clientHeight: height } = gl.canvas as HTMLCanvasElement;
-    resizeViewportToCanvas(gl);
-    if (image) {
-      const { width: nW, height: nH } = image;
-      const [w, h] = getSizeToCover(nW / width, nH / height, 1, 1);
-      // const [w, h] = getSizeToContain(nW / width, nH / height, 1, 1);
-      uniforms.get('u_scale').value = [w, h];
-      uniforms.get('u_offset').value = [0, 0];
-      uniforms.get('u_origin').value = [0.5, 0.5];
-
-      const ratioMax = Math.max(width, height);
-      uniforms.get('u_ratio').value = [width / ratioMax, height / ratioMax];
-    }
-  }
-
-  updateUniforms() {
-    const { uniforms, clock, pointer, gl } = this;
-    // uniforms.get('u_time').value += clock.getDelta();
-    uniforms.get('u_mouse').value = [pointer.x, pointer.y];
-  }
-
-  render = () => {
-    const { gl } = this;
-    if (gl.isContextLost()) return;
-    this.updateSize();
-    this.updateUniforms();
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(GL.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-    nextFrame(this.render);
-  }
-}
+import img_1 from '../assets/test_1.jpg';
+import img_2 from '../assets/test_2.jpg';
+import img_3 from '../assets/test_3.jpg';
+import img_4 from '../assets/test_4.jpg';
+import img_5 from '../assets/test_5.jpg';
+import img_6 from '../assets/test_6.jpg';
+import img_7 from '../assets/test_7.jpg';
+import img_8 from '../assets/test_8.jpg';
+import img_9 from '../assets/test_9.jpg';
+import img_10 from '../assets/test_10.jpg';
+import img_11 from '../assets/test_11.jpg';
+import img_12 from '../assets/test_12.jpg';
+import img_13 from '../assets/test_13.jpg';
+import img_14 from '../assets/test_14.jpg';
+import img_15 from '../assets/test_15.jpg';
+import img_16 from '../assets/test_16.jpg';
+import img_17 from '../assets/test_17.jpg';
+import img_18 from '../assets/test_18.jpg';
+import img_19 from '../assets/test_19.jpg';
+import img_20 from '../assets/test_20.jpg';
+import img_21 from '../assets/test_21.jpg';
 
 const apps = [];
 
-function addInstance() {
-  const canvas = document.createElement('canvas');
-  const app = new WebGLApplication(canvas);
-  apps.push(app);
-  document.body.appendChild(canvas);
-  console.log('Instances:', apps.length);
+
+async function preloadAll(list: string[]) {
+  const promises = [];
+  list.forEach(src => {
+    const p = new Promise(resolve => {
+      const img = new Image();
+      img.onload = resolve;
+      img.src = src;
+    });
+    promises.push(p);
+  });
+  await Promise.all(promises);
 }
 
-document.querySelector('#js-add-btn').addEventListener('click', addInstance);
-addInstance();
+async function initDemo(list: string[]) {
+  await preloadAll(list);
+  console.log('done');
+  list.forEach(src => {
+    const img = document.createElement('div');
+    img.classList.add('image');
+    const span = document.createElement('span');
+    span.style.backgroundImage = `url(${src})`;
+    img.setAttribute('data-image', src);
+    img.appendChild(span);
+    document.body.appendChild(img);
+  });
+  const effect = new ImageEffect('.image');
+}
+
+initDemo([
+  img_2,
+  img_1,
+  img_3,
+  img_4,
+  img_5,
+  img_6,
+  img_7,
+  img_8,
+  img_9,
+  img_10,
+  img_11,
+  img_12,
+  img_13,
+  img_14,
+  img_15,
+  img_16,
+  img_17,
+  img_18,
+  img_19,
+  img_20,
+  img_21,
+]);

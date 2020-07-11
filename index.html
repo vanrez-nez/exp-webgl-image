@@ -6,18 +6,43 @@
   <title>WebGL - Image</title>
   <style>
     body {
+      background: black;
       margin: 0;
     }
-    canvas {
-      width: 50%;
-      height: 40vh;
-      margin: auto;
-      margin-top: 10%;
+    .image canvas {
+      width: 100%;
+      height: 100%;
       display: block;
+      position: absolute;
+      z-index: 1;
     }
+
+    .image {
+      position: relative;
+      display: block;
+      width: 300px;
+      height: 200px;
+      margin: 20px;
+      float: left;
+    }
+
+    .image:last-child {
+      width: calc(100% - 40px);
+    }
+
+    .image span {
+      width: 100%;
+      height: 100%;
+      background-position: center;
+      background-size: cover;
+      position: absolute;
+    }
+
   </style>
 </head>
 <body>
-  <button id="js-add-btn">Add WebGL Instance</button>
+  <div class="wavy-effect">
+    <div></div>
+  </div>
 </body>
 </html>

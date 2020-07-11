@@ -11,5 +11,5 @@ void main() {
   v_uv = (uv - u_origin) / u_scale + u_offset;
   v_uv += u_origin;
   v_uv2 = uv;
-  gl_Position = vec4(position, 0.0, 1.0);
+  gl_Position = vec4(position * vec2(1.0, 1.0), 0.0, 1.0);
 }

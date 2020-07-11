@@ -28,7 +28,7 @@ void main() {
     cos( 0.2 * u_time + d ),
 		sin( 0.2 * u_time - d )
   );
-  vec3 warpedCol = texture2D( u_tNoise, st ).xyz * 1.0;
+  vec3 warpedCol = texture2D( u_tNoise, st ).xyz * 2.0;
   float w = max( warpedCol.r, 0.75);
   vec2 offset = 0.01 * u_waveIntensity * cos( warpedCol.rg * 3.14159 );
   vec3 col = texture2D( u_tImage, uv + offset ).rgb * vec3(1.0, 1.0, 1.5) ;

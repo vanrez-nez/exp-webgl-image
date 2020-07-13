@@ -1,4 +1,3 @@
-import { WebGLImage } from './image';
 import { ImageEffect } from './effect';
 
 import img_1 from '../assets/test_1.jpg';
@@ -41,7 +40,6 @@ async function preloadAll(list: string[]) {
 
 async function initDemo(list: string[]) {
   await preloadAll(list);
-  console.log('done');
   list.forEach(src => {
     const img = document.createElement('div');
     img.classList.add('image');

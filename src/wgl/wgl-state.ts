@@ -35,7 +35,7 @@ export class WebGLState {
 
   setClearColor(r: number, g: number, b: number, a: number) {
     const newColor = [r, g, b, a];
-    if (!arraysEqual(this.clearColor, [r, g, b, a])) {
+    if (!arraysEqual(this.clearColor, newColor)) {
       this.gl.clearColor(r, g, b, a);
       this.clearColor = newColor as Vector4;
     }

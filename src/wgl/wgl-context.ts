@@ -14,14 +14,14 @@ export function createContext(canvas: HTMLCanvasElement, contextType: string, op
 export function resizeViewport(gl: WebGLRenderingContext, width: number, height: number, dpr: number = 1) {
   const { canvas } = gl;
   const [w, h] = [width * dpr, height * dpr];
-  if (canvas.width !== w || canvas.height !== h) {
+  if (getState(gl).setViewport(0, 0, w, h)) {
     canvas.width = w;
     canvas.height = h;
-    getState(gl).setViewport(0, 0, w, h);
     Object.assign((canvas as HTMLCanvasElement).style, {
       width: `${width}px`,
       height: `${height}px`
     });
+    return true;
   }
 }
 

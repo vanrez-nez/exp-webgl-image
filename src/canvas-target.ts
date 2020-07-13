@@ -22,14 +22,15 @@ import {
 export class WebGLCanvasTarget {
 
   public active: boolean;
+  public width: number;
+  public height: number;
+  public canvas: HTMLCanvasElement;
+
   private loaded: boolean;
   private src: string;
   private gl: WebGLRenderingContext;
-  public canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private clock: Clock;
-  private width: number;
-  private height: number;
   private frameBuffer: FrameBuffer;
   private noiseTexture: Texture2D;
   private mainTexture: Texture2D;
@@ -42,7 +43,6 @@ export class WebGLCanvasTarget {
     this.clock = new Clock();
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
-    this.frameBuffer = new FrameBuffer(gl, 0, 0);
     this.width = 0;
     this.height = 0;
     this.loaded = false;
@@ -55,9 +55,9 @@ export class WebGLCanvasTarget {
     this.loaded = true;
   }
 
-  createFrameBuffer() {
-    const { gl, mainTexture, canvas } = this;
-    this.frameBuffer = new FrameBuffer(gl, this.width, this.height);
+  createFrameBuffer(width: number, height: number) {
+    const { gl } = this;
+    this.frameBuffer = new FrameBuffer(gl, width, height);
     this.frameBuffer.bind();
   }
 
@@ -83,8 +83,7 @@ export class WebGLCanvasTarget {
     this.height = height;
     canvas.width = width;
     canvas.height = height;
-    console.log('createBuffer');
-    this.createFrameBuffer();
+    this.createFrameBuffer(width, height);
     if (image) {
       const { width: nW, height: nH } = image;
       const [w, h] = getSizeToCover(nW / width, nH / height, 1, 1);
@@ -159,9 +158,9 @@ export class WebGLCanvasTarget {
     if (this.active && this.loaded) {
       this.mainTexture.bindTexture();
       this.noiseTexture.bindTexture();
-      resizeViewport(gl, this.width, this.height);
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(GL.COLOR_BUFFER_BIT);
+      //resizeViewport(gl, this.width, this.height);
+      //gl.clearColor(0, 0, 0, 0);
+      //gl.clear(GL.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       this.drawToCanvas();
     }
